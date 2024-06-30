@@ -4,18 +4,25 @@ import com.example.demo.domain.Member;
 import com.example.demo.repository.MemoryMemberRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.fail;
 
 class MemberServiceTest {
 
-    MemberService memberService = new MemberService();
-    MemoryMemberRepository repository = new MemoryMemberRepository();
-    
+    MemberService memberService;
+    MemoryMemberRepository memberRepository;
+
+    @BeforeEach
+    public void beforeEach() {
+        memberRepository = new MemoryMemberRepository();
+        memberService = new MemberService(memberRepository);
+
+
+    }
+
     @AfterEach
     public void afterEach() {
-        repository.clearStore();
+        memberRepository.clearStore();
     }
 
     @Test
@@ -35,15 +42,16 @@ class MemberServiceTest {
         member1.setName("spring");
 
         Member member2 = new Member();
-        member1.setName("spring");
+        member2.setName("spring");
 
         memberService.join(member1);
-        try {
-            memberService.join(member2);
-            fail();
-        } catch (IllegalStateException e) {
-            Assertions.assertEquals(e.getMessage(), "이미 존재하는 회원입니다.");
-        }
+        Assertions.assertThrows(IllegalStateException.class, () -> memberService.join(member2));
+//        try {
+//            memberService.join(member2);
+//            fail();
+//        } catch (IllegalStateException e) {
+//            Assertions.assertEquals(e.getMessage(), "이미 존재하는 회원입니다.");
+//        }
     }
 
     @Test
